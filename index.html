@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Nova Tasks — liste de tâches gamifiée, locale et sans compte." />
+  <title>Nova Tasks — Liste de tâches</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar card glass-panel">
+    <div class="top-brand">
+      <strong><i class="bi bi-stars"></i> Nova Tasks</strong>
+    </div>
+    <div id="clockWidget" class="top-clock" aria-live="polite"></div>
+    <div class="top-right">
+      <div class="top-stats">
+        <div class="stat-chip" title="Gemmes disponibles"><span id="topGemGain"></span><i class="bi bi-gem" aria-hidden="true"></i> <strong id="gemCount">0</strong></div>
+        <div class="stat-chip" title="Niveau actuel"><i class="bi bi-trophy" aria-hidden="true"></i> <strong id="levelCount">1</strong></div>
+        <div class="stat-chip" title="Objectifs terminés"><i class="bi bi-check2-square" aria-hidden="true"></i> <strong id="topDoneCount">0</strong></div>
+        <div class="stat-chip" title="Tâches en cours"><i class="bi bi-hourglass-split" aria-hidden="true"></i> <strong id="topInProgressCount">0</strong></div>
+      </div>
+    </div>
+  </header>
+  <div id="app" class="app">
+    <aside class="sidebar card">
+      <h1>Nova Tasks</h1>
+      <p class="muted">Productivité ludique, données sur ton appareil.</p>
+      <nav class="menu" aria-label="Navigation principale">
+        <button type="button" data-section="tasks" class="menu-btn active"><i class="bi bi-list-task" aria-hidden="true"></i> Tâches</button>
+        <button type="button" data-section="stats" class="menu-btn"><i class="bi bi-graph-up" aria-hidden="true"></i> Statistiques</button>
+        <button type="button" data-section="profile" class="menu-btn"><i class="bi bi-person-circle" aria-hidden="true"></i> Profil</button>
+        <button type="button" data-section="shop" class="menu-btn"><i class="bi bi-shop" aria-hidden="true"></i> Boutique</button>
+      </nav>
+
+      <hr />
+      <h3 class="sidebar-heading">Filtres</h3>
+      <div id="mailboxFilters" class="mailbox"></div>
+      <hr />
+      <div id="sidebarTipBanner" class="sidebar-tip-banner" role="status"><span class="sidebar-tip-text"></span></div>
+      <div id="miniCalendar" class="mini-calendar card"></div>
+    </aside>
+
+    <main class="main">
+      <section id="newsFeed" class="news-feed card glass-panel"></section>
+      <section class="toolbar card" aria-label="Actions et tri">
+        <div class="toolbar-left">
+          <div class="toolbar-search-wrap">
+            <label for="taskSearch" class="visually-hidden">Rechercher dans les tâches</label>
+            <span class="toolbar-search-icon" aria-hidden="true"><i class="bi bi-search"></i></span>
+            <input type="search" id="taskSearch" class="toolbar-search-input" placeholder="Rechercher…" autocomplete="off" enterkeyhint="search" />
+          </div>
+          <button type="button" id="addTaskBtn" class="primary" title="Raccourci : Alt+N">Nouvelle tâche</button>
+          <button id="addTagBtnToolbar" type="button" title="Gérer les étiquettes"><i class="bi bi-tags" aria-hidden="true"></i> Étiquettes</button>
+          <button type="button" id="exportBtn">Exporter JSON</button>
+          <label class="import-label">Importer JSON<input id="importInput" type="file" accept=".json" /></label>
+        </div>
+        <div class="toolbar-right">
+          <label class="toolbar-sort-label">Trier par
+            <select id="sortBy" aria-label="Critère de tri">
+              <option value="deadline">Échéance</option>
+              <option value="importance">Importance</option>
+              <option value="progress">Progression</option>
+              <option value="tags">Nombre d’étiquettes</option>
+            </select>
+          </label>
+        </div>
+      </section>
+      <p class="toolbar-hint muted small" id="toolbarHint">Raccourcis : <kbd>/</kbd> ou <kbd>Ctrl</kbd>+<kbd>K</kbd> recherche · <kbd>Alt</kbd>+<kbd>N</kbd> nouvelle tâche · <kbd>Échap</kbd> ferme une fenêtre</p>
+
+      <section id="tasksSection" class="section-view"></section>
+      <section id="taskDetailSection" class="section-view hidden"></section>
+      <section id="statsSection" class="section-view hidden"></section>
+      <section id="profileSection" class="section-view hidden"></section>
+      <section id="shopSection" class="section-view hidden"></section>
+    </main>
+  </div>
+
+  <dialog id="taskDialog" class="dialog"></dialog>
+  <dialog id="bulkDialog" class="dialog"></dialog>
+  <dialog id="tagDialog" class="dialog"></dialog>
+  <dialog id="calendarDayDialog" class="dialog"></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="confettiLayer" class="confetti-layer"></div>
+  <footer class="app-footer">
+    <small>Made by Sören with <span title="Claude — Anthropic">Claude (Anthropic)</span> — craft with care, ship with joy.</small>
+    <small class="app-footer-quote">“We are what we repeatedly do. Excellence, then, is not an act, but a habit.” — Aristotle</small>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

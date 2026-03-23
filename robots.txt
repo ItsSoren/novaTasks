@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://itsSoren.github.io/novaTasks/sitemap.xml

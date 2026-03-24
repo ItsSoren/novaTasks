@@ -108,26 +108,61 @@ const AVATAR_CIRCLE_NAMES = [
 ];
 
 const SIDEBAR_TIPS = [
-  "Break big goals into tiny wins — momentum beats perfection.",
-  "Try the 2-minute rule: if it takes less than 2 minutes, do it now.",
-  "Batch similar tasks — context switching is expensive.",
-  "Estimate time, then multiply by 1.3 — humans are optimistic.",
-  "Your future self thanks you for writing clear next steps.",
-  "Close loops: inbox zero for tasks reduces mental RAM.",
-  "Energy management > time management.",
-  "Celebrate progress — small rewards reinforce habits.",
-  "If it’s not scheduled, it’s not real — pick a slot.",
-  "Review weekly: what worked? what to drop?",
-  "Gratitude rewires your outlook — note one win before you sleep.",
-  "Guard your sleep like a meeting — rest is a performance multiplier.",
-  "Ship something small today; momentum loves consistency.",
-  "Teach what you learned — explaining reveals what you truly know.",
-  "Block focus time on your calendar — make it as real as any deadline.",
-  "One trusted system beats five half-used apps.",
-  "Take a short walk after deep work — your brain connects the dots in motion.",
-  "Say no to good distractions so you can say yes to what matters.",
-  "Mistakes are data; you choose whether they become shame or skill.",
-  "The last 10% often creates most of the impact — finish with care."
+  "Découpe les gros objectifs en mini étapes — le mouvement bat la perfection.",
+  "Règle des 2 minutes : si ça prend moins de 2 min, fais-le direct.",
+  "Regroupe les tâches similaires — changer de contexte te coûte cher.",
+  "Estime ton temps puis ×1,3 — on est toujours trop optimistes.",
+  "Ton futur toi te remerciera pour des prochaines étapes claires.",
+  "Termine ce que tu commences — moins de charge mentale.",
+  "Gérer ton énergie > gérer ton temps.",
+  "Célèbre tes progrès — les petites victoires comptent.",
+  "Si c’est pas planifié, ça n’existe pas.",
+  "Fais un bilan chaque semaine — garde l’utile, supprime le reste.",
+  "Note un truc positif avant de dormir — ça change ton mindset.",
+  "Protège ton sommeil comme un rendez-vous important.",
+  "Fais un petit progrès aujourd’hui — la régularité gagne.",
+  "Explique ce que tu apprends — tu vois direct tes failles.",
+  "Bloque du temps de focus dans ton agenda.",
+  "Un bon système vaut mieux que 5 apps inutilisées.",
+  "Marche après un effort — ton cerveau bosse en fond.",
+  "Dis non aux distractions pour dire oui à l’essentiel.",
+  "Les erreurs sont des données, pas des échecs.",
+  "Les derniers 10% font souvent toute la différence.",
+
+  "Commence par la tâche la plus dure — effet libérateur.",
+  "3 priorités par jour max — le reste est bonus.",
+  "Écris tes tâches en mode action, pas vague.",
+  "Fixe des deadlines artificielles pour avancer.",
+  "Prépare ta journée la veille.",
+  "Travaille en sessions de 25 min si t’as du mal à te lancer.",
+  "Supprime 1 tâche inutile par jour.",
+  "Aie toujours une version facile de ta tâche.",
+  "Note tout — ne fais pas confiance à ta mémoire.",
+  "Optimise ton planning comme un jeu.",
+
+  "Fais une seule chose à la fois — le multitâche est un piège.",
+  "Utilise ton pic d’énergie pour les tâches importantes.",
+  "La motivation vient après l’action.",
+  "Commence par 5 minutes — souvent ça suffit.",
+  "Coupe les notifications pendant le travail.",
+  "Un environnement calme = meilleur focus.",
+  "Change de lieu si t’es bloqué.",
+  "Protège ton attention comme une ressource rare.",
+  "Simplifie au maximum tes tâches.",
+  "Accepte l’ennui — il booste la réflexion.",
+
+  "Tu ne peux pas tout faire — choisis l’essentiel.",
+  "La discipline bat la motivation.",
+  "Agir imparfaitement vaut mieux que ne rien faire.",
+  "Chaque jour est une nouvelle tentative.",
+  "Ton environnement influence ton comportement.",
+  "Rends les bonnes habitudes faciles à faire.",
+  "Rends les mauvaises habitudes difficiles.",
+  "Compare-toi à toi d’hier, pas aux autres.",
+  "Les résultats viennent avec le temps.",
+  "Fais confiance au processus, pas aux émotions.",
+  "You are the player. Wake up."
+  
 ];
 
 const THEMES = makeThemes();
@@ -296,7 +331,7 @@ function initialState() {
     activeAvatarCircle: "circle-1",
     shopPromo: null,
     profile: { name: "Player", avatar: "", weeklyDone: 0, totalDone: 0, shareCardSkinId: "skin-1" },
-    settings: { sidebarTips: true, compactLists: false }
+    settings: { sidebarTips: true, compactLists: false, proMode: false, uiTheme: "dark" }
   };
 }
 
@@ -360,6 +395,7 @@ function loadState() {
     if (!merged.avatarCircleOwned) merged.avatarCircleOwned = ["circle-1"];
     if (!merged.activeAvatarCircle) merged.activeAvatarCircle = "circle-1";
     if (!merged.settings) merged.settings = { ...initialState().settings };
+    merged.settings = { ...initialState().settings, ...merged.settings };
     if (!merged.profile.shareCardSkinId || !(merged.skinOwned || []).includes(merged.profile.shareCardSkinId)) {
       merged.profile.shareCardSkinId = (merged.skinOwned || []).includes("skin-1") ? "skin-1" : (merged.skinOwned || [])[0] || "skin-1";
     }
@@ -559,6 +595,7 @@ function estimateReward(task) {
 function mount() {
   bindGlobalEvents();
   bindDialogBackdropClose();
+  bindSidebarToggle();
   renderAll();
   startClock();
   startSidebarTips();
@@ -604,6 +641,21 @@ function bindDialogBackdropClose() {
     dlg.addEventListener("click", (e) => {
       if (e.target === dlg) dlg.close();
     });
+  });
+}
+
+function bindSidebarToggle() {
+  const btn = document.getElementById("sidebarToggle");
+  const overlay = document.getElementById("sidebarOverlay");
+  const closeSidebar = () => document.body.classList.remove("sidebar-open");
+  if (btn) btn.addEventListener("click", () => document.body.classList.toggle("sidebar-open"));
+  if (overlay) overlay.addEventListener("click", closeSidebar);
+  // Close sidebar when a menu item or filter is clicked on mobile
+  document.querySelectorAll(".menu-btn").forEach((b) => b.addEventListener("click", () => {
+    if (window.innerWidth <= 768) closeSidebar();
+  }));
+  document.getElementById("mailboxFilters")?.addEventListener("click", () => {
+    if (window.innerWidth <= 768) closeSidebar();
   });
 }
 
@@ -701,6 +753,13 @@ function estimateWeeklySavedMinutes() {
 
 function applyBodySettings() {
   document.body.classList.toggle("compact-lists", !!state.settings?.compactLists);
+  document.body.classList.toggle("pro-mode", !!state.settings?.proMode);
+  const theme = state.settings?.uiTheme || "dark";
+  if (theme === "dark") {
+    document.documentElement.removeAttribute("data-ui-theme");
+  } else {
+    document.documentElement.dataset.uiTheme = theme;
+  }
 }
 
 function renderAll() {
@@ -813,6 +872,12 @@ function openCalendarDayDialog(y, mo, d) {
 }
 
 function renderSections() {
+  // Redirect to profile if shop is requested in pro mode
+  if (ui.section === "shop" && state.settings?.proMode) {
+    ui.section = "profile";
+    document.querySelectorAll(".menu-btn").forEach((x) => x.classList.remove("active"));
+    document.querySelector('[data-section="profile"]')?.classList.add("active");
+  }
   const hint = document.getElementById("toolbarHint");
   if (hint) hint.hidden = ui.section !== "tasks";
   ["tasks", "stats", "profile", "shop"].forEach((k) => document.getElementById(`${k}Section`).classList.toggle("hidden", ui.section !== k));
@@ -1073,7 +1138,7 @@ function openTaskDialog(taskId = null) {
       <label>Description<textarea id="taskDesc" placeholder="Contexte, liens utiles…">${escapeHtml(draft.description || "")}</textarea></label>
       <div class="grid-2">
         <label>Importance<select id="taskImp">${[1, 2, 3].map((i) => `<option value="${i}" ${draft.importance === i ? "selected" : ""}>${IMPORTANCE[i]}</option>`).join("")}</select></label>
-        <label>Apparence (skin)<select id="taskSkin">${SKINS.map((s) => `<option value="${s.id}" ${draft.skinId === s.id ? "selected" : ""}>${s.name}${state.skinOwned.includes(s.id) ? "" : " (verrouillé)"}</option>`).join("")}</select></label>
+        <label class="task-skin-field">Apparence (skin)<select id="taskSkin">${SKINS.map((s) => `<option value="${s.id}" ${draft.skinId === s.id ? "selected" : ""}>${s.name}${state.skinOwned.includes(s.id) ? "" : " (verrouillé)"}</option>`).join("")}</select></label>
       </div>
       <div class="tag-dropdown-wrap">
         <label class="d-block mb-1">Étiquettes</label>
@@ -1371,30 +1436,35 @@ function weekAgoTs() { return Date.now() - 7 * 86400000; }
 
 function buildBanners() {
   const out = [];
+  const proMode = !!state.settings?.proMode;
   const promo = ensureShopPromo();
   const pt = THEMES.find((x) => x.id === promo.themeId);
   const ps = SKINS.find((x) => x.id === promo.skinId);
   const pc = AVATAR_CIRCLES.find((x) => x.id === promo.circleId);
-  out.push({
-    title: "🛍️ Promo boutique",
-    body: `${pt?.name || "?"} · ${ps?.name || "?"} · ${pc?.name || "?"} — −${promo.discount}% cette semaine`,
-    taskId: "",
-    meta: "Boutique",
-    bannerKind: "shop"
-  });
+  if (!proMode) {
+    out.push({
+      title: "🛍️ Promo boutique",
+      body: `${pt?.name || "?"} · ${ps?.name || "?"} · ${pc?.name || "?"} — −${promo.discount}% cette semaine`,
+      taskId: "",
+      meta: "Boutique",
+      bannerKind: "shop"
+    });
+  }
   const inprog = state.tasks.filter((t) => t.state === "inprogress");
   const failedWeek = state.tasks.filter((t) => t.state === "failed" && (t.failedAt || 0) >= weekAgoTs());
   const urgent = [...inprog].sort((a, b) => a.deadlineTs - b.deadlineTs)[0];
   const soon = [...inprog].filter((t) => t.deadlineTs - Date.now() < 48 * 3600000 && t.deadlineTs > Date.now()).sort((a, b) => a.deadlineTs - b.deadlineTs)[0];
   const least = [...state.tasks].sort((a, b) => (a.viewCount || 0) - (b.viewCount || 0))[0];
 
-  if (urgent) out.push({ title: "⏰ Échéance la plus proche", body: urgent.title, taskId: urgent.id, meta: "Fin " + toDayString(urgent.deadlineTs) });
-  if (soon) out.push({ title: "🕐 Moins de 48 h", body: soon.title, taskId: soon.id, meta: "À traiter vite" });
+  if (urgent) out.push({ title: proMode ? "📌 Échéance la plus proche" : "⏰ Échéance la plus proche", body: urgent.title, taskId: urgent.id, meta: "Fin " + toDayString(urgent.deadlineTs) });
+  if (soon) out.push({ title: proMode ? "🕐 Urgent (< 48 h)" : "🕐 Moins de 48 h", body: soon.title, taskId: soon.id, meta: "À traiter vite" });
   failedWeek.slice(0, 3).forEach((f) => out.push({ title: "❌ Échec (7 jours)", body: f.title, taskId: f.id, meta: "Corriger ou supprimer" }));
-  if (least) out.push({ title: "👀 Peu consulté", body: least.title, taskId: least.id, meta: "Jeter un œil" });
-  out.push({ title: "📊 Cette semaine", body: `${state.profile.weeklyDone} objectif(s) terminé(s)`, meta: "Continue comme ça", taskId: "" });
-  out.push({ title: "💎 Gemmes & niveau", body: `${state.gems} gemmes · Niv. ${state.level}`, meta: "Profil", taskId: "" });
-  out.push({ title: "🎯 En cours", body: `${inprog.length} tâche(s) active(s)`, meta: "Mode focus", taskId: "" });
+  if (least) out.push({ title: proMode ? "👁 Peu consulté" : "👀 Peu consulté", body: least.title, taskId: least.id, meta: "Jeter un œil" });
+  out.push({ title: proMode ? "📅 Cette semaine" : "📊 Cette semaine", body: `${state.profile.weeklyDone} objectif(s) terminé(s)`, meta: "Continue comme ça", taskId: "" });
+  if (!proMode) {
+    out.push({ title: "💎 Gemmes & niveau", body: `${state.gems} gemmes · Niv. ${state.level}`, meta: "Profil", taskId: "" });
+  }
+  out.push({ title: proMode ? "📋 En cours" : "🎯 En cours", body: `${inprog.length} tâche(s) active(s)`, meta: "Mode focus", taskId: "" });
   return out.filter((x, i, a) => a.findIndex((y) => y.title === x.title && y.body === x.body) === i);
 }
 
@@ -1683,6 +1753,8 @@ function renderProfile() {
   const previewSkin = SKINS.find((x) => x.id === shareSkin) || SKINS[0];
   const tipsOn = !!state.settings?.sidebarTips;
   const compactOn = !!state.settings?.compactLists;
+  const proModeOn = !!state.settings?.proMode;
+  const currentTheme = state.settings?.uiTheme || "dark";
   const doneCount = state.tasks.filter((t) => t.state === "completed").length;
   const skinOptions = state.skinOwned.map((id) => {
     const s = SKINS.find((x) => x.id === id);
@@ -1761,6 +1833,19 @@ function renderProfile() {
 
     <section class="profile-settings-panel card glass-chip">
       <h3 class="profile-block-title"><i class="bi bi-sliders" aria-hidden="true"></i> Paramètres</h3>
+
+      <h4 class="settings-section-title"><i class="bi bi-palette" aria-hidden="true"></i> Thème d'interface</h4>
+      <div class="theme-picker">
+        ${[
+          { id: "dark",   icon: "🌙", label: "Sombre" },
+          { id: "light",  icon: "☀️",  label: "Clair" },
+          { id: "aurora", icon: "✨", label: "Aurora" },
+          { id: "ocean",  icon: "🌊", label: "Océan" },
+          { id: "jade",   icon: "🌿", label: "Jade" }
+        ].map(({ id, icon, label }) => `<label class="theme-option${currentTheme === id ? " theme-option--active" : ""}"><input type="radio" name="uiTheme" id="uiTheme-${id}" value="${id}" ${currentTheme === id ? "checked" : ""}><div class="theme-option-preview" data-theme="${id}">${icon}</div><span class="theme-option-name">${label}</span></label>`).join("")}
+      </div>
+
+      <h4 class="settings-section-title"><i class="bi bi-toggles" aria-hidden="true"></i> Affichage</h4>
       <div class="profile-settings-grid">
         <label class="profile-toggle profile-setting-row">
           <input type="checkbox" id="setSidebarTips" class="form-check-input custom-check" ${tipsOn ? "checked" : ""}>
@@ -1768,7 +1853,11 @@ function renderProfile() {
         </label>
         <label class="profile-toggle profile-setting-row">
           <input type="checkbox" id="setCompactLists" class="form-check-input custom-check" ${compactOn ? "checked" : ""}>
-          <span class="profile-toggle-text"><strong>Listes compactes</strong><span class="muted small d-block">Cartes d’objectifs plus serrées</span></span>
+          <span class="profile-toggle-text"><strong>Listes compactes</strong><span class="muted small d-block">Cartes d'objectifs plus serrées</span></span>
+        </label>
+        <label class="profile-toggle profile-setting-row">
+          <input type="checkbox" id="setProMode" class="form-check-input custom-check" ${proModeOn ? "checked" : ""}>
+          <span class="profile-toggle-text"><strong>Mode Pro</strong><span class="muted small d-block">Masque gemmes, niveaux, boutique et skins pour une interface épurée</span></span>
         </label>
       </div>
       <button type="button" id="saveSettingsBtn" class="profile-save-settings-btn">Enregistrer les paramètres</button>
@@ -1804,6 +1893,9 @@ function renderProfile() {
   root.querySelector("#saveSettingsBtn").onclick = () => {
     state.settings.sidebarTips = root.querySelector("#setSidebarTips").checked;
     state.settings.compactLists = root.querySelector("#setCompactLists").checked;
+    state.settings.proMode = root.querySelector("#setProMode").checked;
+    const selectedTheme = root.querySelector("input[name='uiTheme']:checked");
+    if (selectedTheme) state.settings.uiTheme = selectedTheme.value;
     state.profile.shareCardSkinId = root.querySelector("#shareCardSkin").value;
     save();
     applyBodySettings();
@@ -1813,6 +1905,21 @@ function renderProfile() {
     toast("Paramètres enregistrés");
     renderAll();
   };
+  // Live theme preview on radio change
+  root.querySelectorAll("input[name='uiTheme']").forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const t = radio.value;
+      if (t === "dark") {
+        document.documentElement.removeAttribute("data-ui-theme");
+      } else {
+        document.documentElement.dataset.uiTheme = t;
+      }
+      // Update active class on options
+      root.querySelectorAll(".theme-option").forEach((opt) => {
+        opt.classList.toggle("theme-option--active", opt.querySelector("input")?.value === t);
+      });
+    });
+  });
   root.querySelector("#shareCardSkin").addEventListener("change", (e) => {
     state.profile.shareCardSkinId = e.target.value;
     save();

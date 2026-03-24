@@ -17,13 +17,16 @@
 <body>
   <header class="topbar card glass-panel">
     <div class="top-brand">
+      <button type="button" id="sidebarToggle" aria-label="Ouvrir le menu" title="Menu">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
       <strong><i class="bi bi-stars"></i> Nova Tasks</strong>
     </div>
     <div id="clockWidget" class="top-clock" aria-live="polite"></div>
     <div class="top-right">
       <div class="top-stats">
-        <div class="stat-chip" title="Gemmes disponibles"><span id="topGemGain"></span><i class="bi bi-gem" aria-hidden="true"></i> <strong id="gemCount">0</strong></div>
-        <div class="stat-chip" title="Niveau actuel"><i class="bi bi-trophy" aria-hidden="true"></i> <strong id="levelCount">1</strong></div>
+        <div id="statChipGems" class="stat-chip" title="Gemmes disponibles"><span id="topGemGain"></span><i class="bi bi-gem" aria-hidden="true"></i> <strong id="gemCount">0</strong></div>
+        <div id="statChipLevel" class="stat-chip" title="Niveau actuel"><i class="bi bi-trophy" aria-hidden="true"></i> <strong id="levelCount">1</strong></div>
         <div class="stat-chip" title="Objectifs terminés"><i class="bi bi-check2-square" aria-hidden="true"></i> <strong id="topDoneCount">0</strong></div>
         <div class="stat-chip" title="Tâches en cours"><i class="bi bi-hourglass-split" aria-hidden="true"></i> <strong id="topInProgressCount">0</strong></div>
       </div>
@@ -37,7 +40,7 @@
         <button type="button" data-section="tasks" class="menu-btn active"><i class="bi bi-list-task" aria-hidden="true"></i> Tâches</button>
         <button type="button" data-section="stats" class="menu-btn"><i class="bi bi-graph-up" aria-hidden="true"></i> Statistiques</button>
         <button type="button" data-section="profile" class="menu-btn"><i class="bi bi-person-circle" aria-hidden="true"></i> Profil</button>
-        <button type="button" data-section="shop" class="menu-btn"><i class="bi bi-shop" aria-hidden="true"></i> Boutique</button>
+        <button type="button" data-section="shop" class="menu-btn menu-btn-shop"><i class="bi bi-shop" aria-hidden="true"></i> Boutique</button>
       </nav>
 
       <hr />
@@ -68,7 +71,7 @@
               <option value="deadline">Échéance</option>
               <option value="importance">Importance</option>
               <option value="progress">Progression</option>
-              <option value="tags">Nombre d’étiquettes</option>
+              <option value="tags">Nombre d'étiquettes</option>
             </select>
           </label>
         </div>
@@ -89,10 +92,12 @@
   <dialog id="calendarDayDialog" class="dialog"></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <div id="confettiLayer" class="confetti-layer"></div>
+  <div id="sidebarOverlay"></div>
   <footer class="app-footer">
     <small>Made by Sören with <span title="Claude — Anthropic">Claude (Anthropic)</span> — craft with care, ship with joy.</small>
-    <small class="app-footer-quote">“We are what we repeatedly do. Excellence, then, is not an act, but a habit.” — Aristotle</small>
+    <small class="app-footer-quote">"We are what we repeatedly do. Excellence, then, is not an act, but a habit." — Aristotle</small>
   </footer>
   <script src="app.js"></script>
 </body>
 </html>
+
